@@ -3,6 +3,8 @@ package transport
 import (
 	"fmt"
 	"net"
+
+	"github.com/akansha204/mini-rpc/internal/protocol"
 )
 
 type TCPClient struct {
@@ -23,18 +25,18 @@ func (c *TCPClient) Send(message string) error {
 	}
 	defer conn.Close()
 
-	_, err = conn.Write([]byte(message))
+	err = protocol.WriteFrame(conn, []byte(message))
 
 	if err != nil {
 		return err
 	}
 
-	buffer := make([]byte, 1024)
-	n, err := conn.Read(buffer)
+	// buffer := make([]byte, 1024)
+	payload, err := protocol.ReadFrame(conn)
 
 	if err != nil {
 		return err
 	}
-	fmt.Println("Echoed response:", string(buffer[:n]))
+	fmt.Println("Echoed response:", string(payload))
 	return nil
 }

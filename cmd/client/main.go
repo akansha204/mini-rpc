@@ -8,7 +8,9 @@ import (
 
 func main() {
 	client := transport.NewTCPClient(":8080")
-	err := client.Send("meowww from client")
+	err := client.Send("meowww from client!\nYOKOSO PIRAA PIRAA PUKKI PUKKKI WAKU WAKU WOSHAIIII")
+	err = client.Send("YOWAIII MOOO!!!")
+	err = client.Send("ARAARRAA GOMEENNN!!!")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -2,7 +2,10 @@ package transport
 
 import (
 	"fmt"
+	"io"
 	"net"
+
+	"github.com/akansha204/mini-rpc/internal/protocol"
 )
 
 type TCPServer struct {
@@ -40,18 +43,22 @@ func (s *TCPServer) handleConnection(conn net.Conn) {
 
 	fmt.Println("New connection from", conn.RemoteAddr())
 
-	buffer := make([]byte, 1024)
+	// buffer := make([]byte, 1024)
 
 	for {
-		n, err := conn.Read(buffer)
+		payload, err := protocol.ReadFrame(conn)
+		if err == io.EOF {
+			fmt.Println("Client disconnected:", conn.RemoteAddr())
+			return
+		}
 		if err != nil {
 			fmt.Println("Read error:", err)
 			return
 		}
 
-		fmt.Println("Received:", string(buffer[:n]))
+		fmt.Println("Received:", string(payload))
 
-		_, err = conn.Write(buffer[:n]) //writing back to the tcp
+		err = protocol.WriteFrame(conn, payload) //writing back to the tcp
 		if err != nil {
 			fmt.Println("Write error:", err)
 			return
