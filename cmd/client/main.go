@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
+	"github.com/akansha204/mini-rpc/internal/codec"
+	"github.com/akansha204/mini-rpc/internal/rpc"
 	"github.com/akansha204/mini-rpc/internal/transport"
 )
 
@@ -12,10 +15,32 @@ func main() {
 		log.Fatal(err)
 	}
 	defer client.Close()
-	err := client.Send("meowww from client!\nYOKOSO PIRAA PIRAA PUKKI PUKKKI WAKU WAKU WOSHAIIII")
-	err = client.Send("YOWAIII MOOO!!!")
-	err = client.Send("ARAARRAA GOMEENNN!!!")
+	jsonCodec := &codec.JSONCodec{}
+	rpcClient := rpc.NewClient(jsonCodec, client)
+	var result int
+
+	err := rpcClient.Call("Add", []interface{}{5, 3}, &result)
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("Result", result)
+
+	err = rpcClient.Call("Subtract", []interface{}{5, 3}, &result)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Result", result)
+
+	err = rpcClient.Call("Mul", []interface{}{5, 3}, &result)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Result", result)
+
+	err = rpcClient.Call("Div", []interface{}{5, 5}, &result)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Result", result)
+
 }

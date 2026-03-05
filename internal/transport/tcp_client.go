@@ -2,7 +2,6 @@ package transport
 
 import (
 	"errors"
-	"fmt"
 	"net"
 
 	"github.com/akansha204/mini-rpc/internal/protocol"
@@ -28,25 +27,29 @@ func (c *TCPClient) Connect() error {
 	return nil
 }
 
-func (c *TCPClient) Send(message string) error {
+func (c *TCPClient) Send(message []byte) error {
 	if c.conn == nil {
 		return errors.New("not connected")
 	}
 
-	err := protocol.WriteFrame(c.conn, []byte(message))
+	err := protocol.WriteFrame(c.conn, message)
 
 	if err != nil {
 		return err
 	}
 
 	// buffer := make([]byte, 1024)
-	payload, err := protocol.ReadFrame(c.conn)
+	// payload, err := protocol.ReadFrame(c.conn)
 
-	if err != nil {
-		return err
-	}
-	fmt.Println("Echoed response:", string(payload))
+	// if err != nil {
+	// 	return err
+	// }
+	// fmt.Println("Echoed response:", string(payload))
 	return nil
+}
+
+func (c *TCPClient) Receive() ([]byte, error) {
+	return protocol.ReadFrame(c.conn)
 }
 
 func (c *TCPClient) Close() error {

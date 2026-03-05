@@ -9,12 +9,14 @@ import (
 )
 
 type TCPServer struct {
-	addr string
+	addr    string
+	handler func([]byte) ([]byte, error)
 }
 
-func NewTCPServer(addr string) *TCPServer {
+func NewTCPServer(addr string, handler func([]byte) ([]byte, error)) *TCPServer {
 	return &TCPServer{
-		addr: addr,
+		addr:    addr,
+		handler: handler,
 	}
 }
 
@@ -55,10 +57,12 @@ func (s *TCPServer) handleConnection(conn net.Conn) {
 			fmt.Println("Read error:", err)
 			return
 		}
-
-		fmt.Println("Received:", string(payload))
-
-		err = protocol.WriteFrame(conn, payload) //writing back to the tcp
+		resbytes, err := s.handler(payload)
+		if err != nil {
+			fmt.Println("RPC Handle error:", err)
+			return
+		}
+		err = protocol.WriteFrame(conn, resbytes) //writing back to the tcp
 		if err != nil {
 			fmt.Println("Write error:", err)
 			return
