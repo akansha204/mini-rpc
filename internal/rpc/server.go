@@ -33,7 +33,7 @@ func (s *Server) Handle(data []byte) ([]byte, error) {
 		return s.codec.Encode(resp)
 	}
 
-	result, err := handler(req.Params)
+	responsePayload, err := handler(req.Payload)
 	if err != nil {
 		resp := protocol.Response{
 			ID:    req.ID,
@@ -43,8 +43,9 @@ func (s *Server) Handle(data []byte) ([]byte, error) {
 	}
 
 	resp := protocol.Response{
-		ID:     req.ID,
-		Result: result,
+		ID:      req.ID,
+		Payload: responsePayload,
 	}
+
 	return s.codec.Encode(resp)
 }
