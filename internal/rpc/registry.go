@@ -1,6 +1,6 @@
 package rpc
 
-type HandlerFunc func(params []interface{}) (interface{}, error)
+type HandlerFunc func(payload []byte) ([]byte, error)
 
 type Registry struct {
 	methods map[string]HandlerFunc
