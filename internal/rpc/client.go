@@ -20,25 +20,28 @@ func NewClient(c codec.Codec, conn *transport.TCPClient) *Client {
 		conn:  conn,
 	}
 }
-func (c *Client) Call(method string, params []interface{}, result interface{}) error {
+func (c *Client) Call(method string, req interface{}, result interface{}) error {
 	c.id++
 
-	req := protocol.Request{
-		ID:     c.id,
-		Method: method,
-		Params: params,
-	}
-
-	data, err := c.codec.Encode(req)
+	payload, err := c.codec.Encode(req)
 	if err != nil {
 		return err
 	}
 
-	err = c.conn.Send(data)
+	request := protocol.Request{
+		ID:      c.id,
+		Method:  method,
+		Payload: payload,
+	}
+
+	data, err := c.codec.Encode(request)
 	if err != nil {
 		return err
 	}
 
+	if err := c.conn.Send(data); err != nil{
+		return err
+	}
 	respBytes, err := c.conn.Receive()
 	if err != nil {
 		return err
@@ -53,7 +56,6 @@ func (c *Client) Call(method string, params []interface{}, result interface{}) e
 	if resp.Error != "" {
 		return errors.New(resp.Error)
 	}
-	data, _ = c.codec.Encode(resp.Result)
-	return c.codec.Decode(data, result)
+	return c.codec.Decode(resp.Payload, result)
 
 }
