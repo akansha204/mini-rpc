@@ -49,3 +49,7 @@ func (s *Server) Handle(data []byte) ([]byte, error) {
 
 	return s.codec.Encode(resp)
 }
+
+func (s *Server) Register(method string, handler HandlerFunc) {
+	s.registry.Register(method, handler)
+}
