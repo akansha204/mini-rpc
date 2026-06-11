@@ -1,15 +1,13 @@
 package protocol
 
-import "encoding/json"
-
 type Request struct {
-	ID      uint64          `json:"id"`
-	Method  string          `json:"method"`
-	Payload json.RawMessage `json:"payload"`
+	ID      uint64 `json:"id"`
+	Method  string `json:"method"`
+	Payload []byte `json:"payload"`
 }
 
 type Response struct {
-	ID      uint64          `json:"id"`
-	Payload json.RawMessage `json:"payload"`
-	Error   string          `json:"error"`
+	ID      uint64 `json:"id"`
+	Payload []byte `json:"payload"`
+	Error   string `json:"error"`
 }
