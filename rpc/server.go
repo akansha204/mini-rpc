@@ -3,6 +3,7 @@ package rpc
 import (
 	"github.com/akansha204/mini-rpc/internal/codec"
 	"github.com/akansha204/mini-rpc/internal/protocol"
+	"github.com/akansha204/mini-rpc/internal/transport"
 )
 
 type Server struct {
@@ -14,6 +15,13 @@ func NewServer(c codec.Codec, r *Registry) *Server {
 	return &Server{
 		codec:    c,
 		registry: r,
+	}
+}
+
+func NewDefaultServer() *Server {
+	return &Server{
+		codec:    &codec.JSONCodec{},
+		registry: NewRegistry(),
 	}
 }
 
@@ -60,4 +68,9 @@ func (s *Server) Encode(v any) ([]byte, error) {
 
 func (s *Server) Decode(data []byte, v any) error {
 	return s.codec.Decode(data, v)
+}
+
+func (s *Server) Serve(addr string) error {
+	tcpServer := transport.NewTCPServer(addr, s.Handle)
+	return tcpServer.Start()
 }
