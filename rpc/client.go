@@ -20,6 +20,21 @@ func NewClient(c codec.Codec, conn *transport.TCPClient) *Client {
 		conn:  conn,
 	}
 }
+
+func NewDefaultClient(addr string) (*Client, error) {
+	conn := transport.NewTCPClient(addr)
+	if err := conn.Connect(); err != nil {
+		return nil, err
+	}
+	return &Client{
+		codec: &codec.JSONCodec{},
+		conn:  conn,
+	}, nil
+}
+
+func (c *Client) Close() error {
+	return c.conn.Close()
+}
 func (c *Client) Call(method string, req interface{}, result interface{}) error {
 	c.id++
 
